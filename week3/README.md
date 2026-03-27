@@ -1,72 +1,277 @@
-# Week 3 — Open-Meteo MCP Server（本地 STDIO）
+# Week 3: Open-Meteo MCP Server
 
-本目录实现一个封装 [Open-Meteo](https://open-meteo.com/)（地理编码 + 实况天气）的 MCP 服务器，**无需 API Key**。
+Chinese version: [README.zh-CN.md](C:/Users/gabri/Documents/cs146s/modern-software-dev-assignments-master/week3/README.zh-CN.md)
 
-## 先决条件
+This directory contains a production-style MCP server for the Week 3 assignment. It wraps the public [Open-Meteo](https://open-meteo.com/) APIs and exposes weather lookup capabilities through MCP tools, plus one supporting resource and one prompt for better client UX.
+
+The implementation targets the **local STDIO deployment mode** required by the assignment. It is structured for maintainability rather than as a single-file demo.
+
+## Assignment Coverage
+
+This implementation satisfies the Week 3 requirements by providing:
+
+- A real external API integration using Open-Meteo geocoding and forecast endpoints.
+- Two MCP tools:
+  - `search_place`
+  - `get_current_weather`
+- Resilience for:
+  - invalid tool inputs
+  - HTTP transport errors
+  - timeouts
+  - HTTP 429 rate limiting
+  - upstream 4xx/5xx failures
+  - empty results
+  - malformed upstream payloads
+- Clear setup and run instructions.
+- MCP client configuration examples for Cursor and Claude Desktop.
+- Example invocation flow and tool reference.
+- Minimal automated tests for critical edge cases.
+
+## Project Structure
+
+```text
+week3/
+├── assignment.md
+├── README.md
+├── requirements.txt
+├── server/
+│   ├── app.py
+│   ├── config.py
+│   ├── errors.py
+│   ├── formatters.py
+│   ├── logging_utils.py
+│   ├── main.py
+│   ├── models.py
+│   ├── openmeteo_client.py
+│   ├── prompts.py
+│   ├── resources.py
+│   ├── service.py
+│   ├── tools.py
+│   └── validation.py
+└── tests/
+    ├── test_openmeteo_client.py
+    ├── test_tools.py
+    └── test_validation.py
+```
+
+## Upstream APIs
+
+This server uses the following Open-Meteo endpoints:
+
+- Geocoding API: `GET https://geocoding-api.open-meteo.com/v1/search`
+- Forecast API: `GET https://api.open-meteo.com/v1/forecast`
+
+No API key is required.
+
+## Requirements
 
 - Python 3.10+
-- 可访问公网的 HTTPS（调用 `geocoding-api.open-meteo.com` 与 `api.open-meteo.com`）
+- Internet access to `geocoding-api.open-meteo.com` and `api.open-meteo.com`
 
-## 安装
+## Installation
 
-在仓库根目录执行：
+From the repository root:
 
 ```bash
 pip install -r week3/requirements.txt
 ```
 
-## 运行（STDIO）
+If you want to run tests and `pytest` is not already installed in your environment:
 
-在仓库根目录：
+```bash
+pip install pytest
+```
+
+## Running the MCP Server
+
+From the repository root:
 
 ```bash
 python -m week3.server.main
 ```
 
-服务器从标准输入读取 MCP 消息、向标准输出写入协议数据；**日志在 stderr**，请勿向 stdout 打印调试信息。
+This is an **STDIO MCP server**:
 
-## 在 Cursor / Claude Desktop 中注册
+- MCP protocol messages are read from stdin and written to stdout.
+- Application logs are written to stderr only.
+- Do not manually type into the process after starting it in a terminal.
+- The normal way to use it is to let an MCP client such as Cursor or Claude Desktop start the process.
 
-将 `command` 换成你的 `python` 绝对路径（Windows 可用 `where python` 查看）。`args` 里第一项必须是本仓库根目录的**绝对路径**。
+## MCP Client Configuration
+
+### Cursor
+
+Create either `.cursor/mcp.json` inside the repository or `%USERPROFILE%\\.cursor\\mcp.json` globally:
+
+```json
+{
+  "mcpServers": {
+    "openmeteo": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "week3.server.main"],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}
+```
+
+After editing the file, fully restart Cursor and inspect **MCP Logs** if the server does not appear.
+
+Important: after adding the config file, open **Cursor Settings > MCP** and make sure the `openmeteo` server is explicitly **Enabled**. A valid config file alone is not always enough if the server is still disabled in the UI.
+
+### Claude Desktop
+
+Edit `%AppData%\\Claude\\claude_desktop_config.json` and add:
 
 ```json
 {
   "mcpServers": {
     "openmeteo": {
       "command": "python",
-      "args": [
-        "-m",
-        "week3.server.main"
-      ],
-      "cwd": "C:\\Users\\YOU\\Documents\\cs146s\\modern-software-dev-assignments-master"
+      "args": ["-m", "week3.server.main"],
+      "cwd": "C:\\\\path\\\\to\\\\modern-software-dev-assignments-master"
     }
   }
 }
 ```
 
-- **Cursor**：在 MCP 设置里添加上述配置（或等价字段）。
-- **Claude Desktop**：编辑 `claude_desktop_config.json`（Windows 一般在 `%AppData%\\Claude\\claude_desktop_config.json`），把 `cwd` 改成你的机器上的路径。
+Replace `cwd` with the absolute path to your repository root, then restart Claude Desktop.
 
-重启客户端后，应能看到名为 `openmeteo` 的服务器及下方工具。
+## Tool Reference
 
-## Tools 说明
+### `search_place`
 
-| 名称 | 作用 | 主要参数 |
-|------|------|----------|
-| `search_place` | 地名搜索，返回候选地点与经纬度 | `name`：地名；`max_results`：1–10，默认 5 |
-| `current_weather` | 按经纬度查询当前天气摘要 | `latitude`：-90～90；`longitude`：-180～180 |
+Resolves a city or place name into one or more candidate locations.
 
-**示例对话**：先调用 `search_place` 得到北京坐标，再将返回的纬度、经度传给 `current_weather`。
+Parameters:
 
-## 行为说明
+- `name` (`str`, required): place name to search for.
+- `max_results` (`int`, optional, default `5`): maximum number of results, from `1` to `10`.
 
-- HTTP 超时、非 2xx、网络错误：工具返回可读错误说明，并写日志到 stderr。
-- 遇到 HTTP 429：简单退避后重试（最多 3 次）。
-- 无匹配地名或空数据：返回明确提示，不抛未捕获异常。
+Example input:
 
-## 外部 API
+```json
+{
+  "name": "Beijing",
+  "max_results": 2
+}
+```
 
-- 地理编码：`GET https://geocoding-api.open-meteo.com/v1/search`
-- 预报/当前：`GET https://api.open-meteo.com/v1/forecast`（使用 `current` 变量）
+Example output:
 
-文档：<https://open-meteo.com/en/docs>
+```text
+1. Beijing (China, Beijing)
+   Coordinates: 39.9042, 116.4074
+```
+
+Expected behavior:
+
+- Rejects blank or overly long place names.
+- Rejects `max_results` outside `1..10`.
+- Returns a concise "not found" message if no place matches.
+- Returns a user-friendly error message if the upstream service fails.
+
+### `get_current_weather`
+
+Fetches current weather conditions for a coordinate pair.
+
+Parameters:
+
+- `latitude` (`float`, required): between `-90` and `90`.
+- `longitude` (`float`, required): between `-180` and `180`.
+
+Example input:
+
+```json
+{
+  "latitude": 39.9042,
+  "longitude": 116.4074
+}
+```
+
+Example output:
+
+```text
+Observed at: 2026-03-27T15:00
+Conditions: Mostly clear
+Temperature: 18.4 C
+Feels like: 17.9 C
+Relative humidity: 32%
+Wind: 11.2 km/h at 210 degrees
+```
+
+Expected behavior:
+
+- Rejects invalid latitude/longitude values.
+- Returns stable plain-text output for LLM consumption.
+- Distinguishes between validation failures, not-found conditions, and upstream service failures.
+
+## Additional MCP Capabilities
+
+Although the assignment requires only tools, this server also includes:
+
+- Resource: `openmeteo://server-info`
+  - Gives a concise overview of server behavior, upstream endpoints, and retry policy.
+- Prompt: `plan_weather_lookup`
+  - Helps a client plan a two-step weather lookup flow.
+
+These are lightweight additions and do not replace the required tools.
+
+## Example Invocation Flow
+
+In a client such as Cursor or Claude Desktop:
+
+1. Ask: `Find the current weather in Beijing.`
+2. The client should call `search_place` with `name="Beijing"`.
+3. The model chooses the most relevant returned location.
+4. The client then calls `get_current_weather` with that result's coordinates.
+5. The model summarizes the observed weather and mentions the observation time.
+
+You can also explicitly guide the client:
+
+```text
+Use the search_place tool to find Beijing, then call get_current_weather with the returned coordinates.
+```
+
+## Reliability and Error Handling
+
+The implementation includes:
+
+- centralized configuration for URLs, timeouts, retry counts, backoff, and user-agent
+- input validation before any upstream request
+- HTTP timeout handling
+- transport error handling
+- explicit handling for upstream 429 rate limiting
+- explicit handling for upstream 4xx and 5xx responses
+- malformed JSON and malformed payload shape detection
+- stderr-only logging, safe for STDIO MCP usage
+
+User-facing tool messages are intentionally concise. Developer-facing detail stays in stderr logs.
+
+## Running Tests
+
+From the repository root:
+
+```bash
+pytest week3/tests -q
+```
+
+The test suite covers:
+
+- invalid tool parameters
+- empty search results
+- malformed upstream payloads
+- upstream timeout translation
+- upstream 429 handling
+- MCP registration of required tools and resource
+
+## Limitations
+
+- This submission implements the **local STDIO mode**, not remote HTTP transport.
+- It does not implement authentication because Open-Meteo does not require an API key.
+- Real upstream behavior still depends on network availability and Open-Meteo uptime.
+
+## Verification Notes
+
+In this repository environment, automated tests can verify validation, formatting, and mocked upstream error handling without needing live network access. A full real-network end-to-end run should still be done in Cursor, Claude Desktop, or MCP Inspector on a machine with internet access before final submission.

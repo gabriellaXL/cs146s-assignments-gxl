@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "openmeteo": {
+      "type": "stdio",
+      "command": "C:\\Users\\gabri\\anaconda3\\python.exe",
+      "args": ["-m", "week3.server.main"],
+      "cwd": "C:\\Users\\gabri\\Documents\\cs146s\\modern-software-dev-assignments-master"
+    }
+  }
+}
