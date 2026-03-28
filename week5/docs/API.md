@@ -1,46 +1,36 @@
-# API Reference — Week 5 Backend
+﻿# API Reference — week5
 
-Base URL: `http://localhost:8000`  
-Interactive docs: `http://localhost:8000/docs`
+> Generated from `/openapi.json`. Re-run the *Docs Sync* saved prompt after any API changes.
+> Interactive docs: `http://localhost:8000/docs`
 
 ---
 
 ## Notes
 
-### `GET /notes/`
-Return all notes.
+Base path: `/notes`
 
-**Response** `200`
+### `GET /notes/`
+List all notes.
+
+**Response 200** — `NoteRead[]`
 ```json
-[
-  { "id": 1, "title": "My note", "content": "Hello world" }
-]
+[{ "id": 1, "title": "...", "content": "..." }]
 ```
 
 ---
 
 ### `POST /notes/`
-Create a note.
+Create a new note.
 
-**Body**
-```json
-{ "title": "string", "content": "string" }
-```
+**Request body** — `NoteCreate`
 
-**Response** `201`
-```json
-{ "id": 2, "title": "string", "content": "string" }
-```
+| Field | Type | Constraints |
+|-------|------|-------------|
+| `title` | string | required, 1–200 chars, whitespace stripped |
+| `content` | string | required, min 1 char, whitespace stripped |
 
----
-
-### `GET /notes/{note_id}`
-Get a single note by ID.
-
-**Path param** `note_id: int`
-
-**Response** `200` — `NoteRead` object  
-**Response** `404` — `{ "detail": "Note not found" }`
+**Response 201** — `NoteRead`
+**Response 422** — validation error
 
 ---
 
@@ -48,29 +38,69 @@ Get a single note by ID.
 Search notes by title or content (case-insensitive substring match).
 
 **Query params**
-| Param | Type | Description |
-|-------|------|-------------|
-| `q` | `string` (optional) | Search term; omit to return all |
 
-**Response** `200` — list of `NoteRead`
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `q` | string | `null` | Search term. If omitted, returns all notes. |
+
+**Response 200** — `NoteRead[]`
+
+---
+
+### `GET /notes/{note_id}`
+Get a single note by ID.
+
+**Path params**: `note_id` (integer, required)
+
+**Response 200** — `NoteRead`
+**Response 404** — note not found
+
+---
+
+### `PUT /notes/{note_id}`
+Full replacement update (PUT semantics). All fields are required.
+
+**Path params**: `note_id` (integer, required)
+
+**Request body** — `NoteUpdate`
+
+| Field | Type | Constraints |
+|-------|------|-------------|
+| `title` | string | required, 1–200 chars, whitespace stripped |
+| `content` | string | required, min 1 char, whitespace stripped |
+
+**Response 200** — `NoteRead` (updated)
+**Response 404** — note not found
+**Response 422** — validation error
+
+---
+
+### `DELETE /notes/{note_id}`
+Delete a note. A second call on the same ID returns 404.
+
+**Path params**: `note_id` (integer, required)
+
+**Response 204** — No Content (empty body)
+**Response 404** — note not found
 
 ---
 
 ## Action Items
 
+Base path: `/action-items`
+
 ### `GET /action-items/`
-Return action items, optionally filtered by completion status.
+List action items, optionally filtered by completion status.
 
 **Query params**
-| Param | Type | Description |
-|-------|------|-------------|
-| `completed` | `bool` (optional) | `true` → only done items; `false` → only open items; omit → all |
 
-**Response** `200`
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `completed` | bool | omit | `true` → done only; `false` → open only; omit → all |
+
+**Response 200** — `ActionItemRead[]`
 ```json
-[
-  { "id": 1, "description": "Ship it", "completed": false }
-]
+[{ "id": 1, "description": "Ship it", "completed": false }]
 ```
 
 ---
@@ -78,25 +108,24 @@ Return action items, optionally filtered by completion status.
 ### `POST /action-items/`
 Create a new action item (always starts incomplete).
 
-**Body**
-```json
-{ "description": "string" }
-```
+**Request body** — `ActionItemCreate`
 
-**Response** `201`
-```json
-{ "id": 3, "description": "string", "completed": false }
-```
+| Field | Type | Constraints |
+|-------|------|-------------|
+| `description` | string | required, min 1 char, whitespace stripped |
+
+**Response 201** — `ActionItemRead`
+**Response 422** — validation error
 
 ---
 
 ### `PUT /action-items/{item_id}/complete`
-Mark a single action item as completed.
+Mark a single action item as completed. Idempotent (calling twice is safe).
 
-**Path param** `item_id: int`
+**Path params**: `item_id` (integer, required)
 
-**Response** `200` — `ActionItemRead` with `completed: true`  
-**Response** `404` — `{ "detail": "Action item not found" }`
+**Response 200** — `ActionItemRead` (with `completed: true`)
+**Response 404** — item not found
 
 ---
 
@@ -104,25 +133,69 @@ Mark a single action item as completed.
 Mark multiple action items as completed in a single atomic transaction.
 
 - Deduplicates IDs before processing.
-- **All-or-nothing**: if any ID does not exist the whole operation is rolled back and `404` is returned.
+- **All-or-nothing**: if any ID does not exist, the whole operation is rolled back and `404` is returned.
 
-**Body**
+**Request body** — `BulkCompleteRequest`
+
+| Field | Type | Constraints |
+|-------|------|-------------|
+| `ids` | `list[int]` | Non-empty; duplicates are deduplicated |
+
 ```json
 { "ids": [1, 2, 3] }
 ```
 
-| Field | Type | Constraints |
-|-------|------|-------------|
-| `ids` | `list[int]` | Non-empty; duplicates are ignored |
-
-**Response** `200`
+**Response 200** — `BulkCompleteResponse`
 ```json
 { "updated": 3, "ids": [1, 2, 3] }
 ```
 
-**Response** `404` — one or more IDs were not found; nothing was persisted.
+**Response 404** — one or more IDs not found; nothing was persisted.
 ```json
 { "detail": "Action items not found: [99]" }
 ```
 
-**Response** `422` — validation error (e.g. empty `ids` list).
+**Response 422** — validation error (e.g. empty `ids` list).
+
+---
+
+## Schemas
+
+### `NoteRead`
+```json
+{ "id": 1, "title": "string", "content": "string" }
+```
+
+### `NoteCreate` / `NoteUpdate`
+```json
+{ "title": "string (1-200 chars)", "content": "string (min 1 char)" }
+```
+
+### `ActionItemRead`
+```json
+{ "id": 1, "description": "string", "completed": false }
+```
+
+### `ActionItemCreate`
+```json
+{ "description": "string (min 1 char)" }
+```
+
+### `BulkCompleteRequest`
+```json
+{ "ids": [1, 2, 3] }
+```
+
+### `BulkCompleteResponse`
+```json
+{ "updated": 3, "ids": [1, 2, 3] }
+```
+
+### Validation error (422)
+```json
+{
+  "detail": [
+    { "loc": ["body", "title"], "msg": "String should have at least 1 character", "type": "string_too_short" }
+  ]
+}
+```

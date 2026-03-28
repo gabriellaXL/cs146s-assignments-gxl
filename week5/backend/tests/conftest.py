@@ -41,6 +41,7 @@ def client() -> Generator[TestClient, None, None]:
 
     # Dispose all pooled connections before unlinking — required on Windows
     # where SQLite holds a file lock until the connection pool is fully released.
+    # Also clear dependency overrides so subsequent fixtures get a fresh state.
     engine.dispose()
     app.dependency_overrides.clear()
     os.unlink(db_path)

@@ -1,13 +1,20 @@
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db import get_db
 from ..models import Note
-from ..schemas import NoteCreate, NoteRead
+from ..schemas import NoteCreate, NoteRead, NoteUpdate
 
 router = APIRouter(prefix="/notes", tags=["notes"])
+
+
+def _get_note_or_404(note_id: int, db: Session) -> Note:
+    """Fetch a Note by PK or raise 404. Centralises the repeated lookup pattern."""
+    note = db.get(Note, note_id)
+    if note is None:
+        raise HTTPException(status_code=404, detail="Note not found")
+    return note
 
 
 @router.get("/", response_model=list[NoteRead])
@@ -40,7 +47,24 @@ def search_notes(q: str | None = None, db: Session = Depends(get_db)) -> list[No
 
 @router.get("/{note_id}", response_model=NoteRead)
 def get_note(note_id: int, db: Session = Depends(get_db)) -> NoteRead:
-    note = db.get(Note, note_id)
-    if not note:
-        raise HTTPException(status_code=404, detail="Note not found")
+    note = _get_note_or_404(note_id, db)
     return NoteRead.model_validate(note)
+
+
+@router.put("/{note_id}", response_model=NoteRead)
+def update_note(note_id: int, payload: NoteUpdate, db: Session = Depends(get_db)) -> NoteRead:
+    """Full replacement update (PUT semantics). Returns the updated note."""
+    note = _get_note_or_404(note_id, db)
+    note.title = payload.title
+    note.content = payload.content
+    db.flush()
+    db.refresh(note)
+    return NoteRead.model_validate(note)
+
+
+@router.delete("/{note_id}", status_code=204)
+def delete_note(note_id: int, db: Session = Depends(get_db)) -> None:
+    """Delete a note. Returns 204 No Content on success."""
+    note = _get_note_or_404(note_id, db)
+    db.delete(note)
+    db.flush()
