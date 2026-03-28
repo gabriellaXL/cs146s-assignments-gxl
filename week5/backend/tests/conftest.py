@@ -36,4 +36,8 @@ def client() -> Generator[TestClient, None, None]:
     with TestClient(app) as c:
         yield c
 
+    # Dispose engine before unlinking the temp file.
+    # On Windows, SQLite holds a file lock until all connections are closed;
+    # without this, os.unlink raises PermissionError during teardown.
+    engine.dispose()
     os.unlink(db_path)

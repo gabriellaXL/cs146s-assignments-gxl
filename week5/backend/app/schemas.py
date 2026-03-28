@@ -1,9 +1,25 @@
-from pydantic import BaseModel
+from typing import Annotated
+
+from pydantic import BaseModel, StringConstraints
+
+# Reusable constrained string types (Pydantic v2 pattern).
+# strip_whitespace trims surrounding whitespace before validation,
+# so "   " becomes "" and fails min_length=1 with a clear 422.
+TitleStr = Annotated[str, StringConstraints(min_length=1, max_length=200, strip_whitespace=True)]
+ContentStr = Annotated[str, StringConstraints(min_length=1, strip_whitespace=True)]
+DescStr = Annotated[str, StringConstraints(min_length=1, strip_whitespace=True)]
 
 
 class NoteCreate(BaseModel):
-    title: str
-    content: str
+    title: TitleStr
+    content: ContentStr
+
+
+class NoteUpdate(BaseModel):
+    """Full replacement payload for PUT /notes/{id}."""
+
+    title: TitleStr
+    content: ContentStr
 
 
 class NoteRead(BaseModel):
@@ -11,12 +27,11 @@ class NoteRead(BaseModel):
     title: str
     content: str
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class ActionItemCreate(BaseModel):
-    description: str
+    description: DescStr
 
 
 class ActionItemRead(BaseModel):
@@ -24,5 +39,4 @@ class ActionItemRead(BaseModel):
     description: str
     completed: bool
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
