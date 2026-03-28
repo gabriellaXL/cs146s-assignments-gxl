@@ -16,7 +16,10 @@ def client() -> Generator[TestClient, None, None]:
     db_fd, db_path = tempfile.mkstemp()
     os.close(db_fd)
 
-    engine = create_engine(f"sqlite:///{db_path}", connect_args={"check_same_thread": False})
+    engine = create_engine(
+        f"sqlite:///{db_path}",
+        connect_args={"check_same_thread": False},
+    )
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     Base.metadata.create_all(bind=engine)
 
@@ -36,4 +39,8 @@ def client() -> Generator[TestClient, None, None]:
     with TestClient(app) as c:
         yield c
 
+    # Dispose all pooled connections before unlinking — required on Windows
+    # where SQLite holds a file lock until the connection pool is fully released.
+    engine.dispose()
+    app.dependency_overrides.clear()
     os.unlink(db_path)

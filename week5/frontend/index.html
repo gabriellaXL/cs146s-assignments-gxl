@@ -26,6 +26,20 @@
           <input id="action-desc" placeholder="Description" required />
           <button type="submit">Add</button>
         </form>
+
+        <!-- Filter toolbar -->
+        <div class="filter-bar" role="group" aria-label="Filter action items">
+          <button class="active" data-filter="all">All</button>
+          <button data-filter="false">Open</button>
+          <button data-filter="true">Done</button>
+        </div>
+
+        <!-- Bulk action row -->
+        <div class="bulk-bar">
+          <span id="selected-count">0 selected</span>
+          <button id="bulk-complete-btn" disabled>Mark Selected Done</button>
+        </div>
+
         <ul id="actions"></ul>
       </section>
     </main>
