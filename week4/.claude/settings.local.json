@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make test:*)",
+      "Bash(PYTHONPATH=. pytest -q backend/tests)",
+      "Bash(python -m ruff check .)",
+      "Bash(PYTHONPATH=. pytest -v backend/tests)"
+    ]
+  }
+}

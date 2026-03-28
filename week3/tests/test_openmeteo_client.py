@@ -19,11 +19,14 @@ from week3.server.openmeteo_client import OpenMeteoClient
 def _make_client(handler):
     transport = httpx.MockTransport(handler)
     http_client = httpx.AsyncClient(transport=transport)
-    return OpenMeteoClient(
-        config=DEFAULT_CONFIG,
-        logger=configure_logging(),
-        client=http_client,
-    ), http_client
+    return (
+        OpenMeteoClient(
+            config=DEFAULT_CONFIG,
+            logger=configure_logging(),
+            client=http_client,
+        ),
+        http_client,
+    )
 
 
 async def _run_search_places_success() -> None:

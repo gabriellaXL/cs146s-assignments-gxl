@@ -4,7 +4,6 @@ import sqlite3
 from pathlib import Path
 from typing import Optional
 
-
 BASE_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = BASE_DIR / "data"
 DB_PATH = DATA_DIR / "app.db"
@@ -147,5 +146,3 @@ def mark_action_item_done(action_item_id: int, done: bool) -> bool:
             return cursor.rowcount > 0
     except sqlite3.Error as exc:
         raise DatabaseError("failed to update action item status") from exc
-
-

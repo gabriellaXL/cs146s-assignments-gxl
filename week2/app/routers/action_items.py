@@ -5,7 +5,6 @@ from typing import Callable, Optional
 from fastapi import APIRouter, HTTPException
 
 from .. import db
-from ..services.extract import extract_action_items, extract_action_items_llm
 from ..schemas import (
     ActionItemExtractRequest,
     ActionItemExtractResponse,
@@ -14,7 +13,7 @@ from ..schemas import (
     MarkDoneRequest,
     MarkDoneResponse,
 )
-
+from ..services.extract import extract_action_items, extract_action_items_llm
 
 router = APIRouter(prefix="/action-items", tags=["action-items"])
 
@@ -74,5 +73,3 @@ def mark_done(action_item_id: int, payload: MarkDoneRequest) -> MarkDoneResponse
     if not updated:
         raise HTTPException(status_code=404, detail="action item not found")
     return MarkDoneResponse(id=action_item_id, done=payload.done)
-
-

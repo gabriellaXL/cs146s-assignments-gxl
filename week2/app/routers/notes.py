@@ -5,7 +5,6 @@ from fastapi import APIRouter, HTTPException
 from .. import db
 from ..schemas import NoteCreateRequest, NoteResponse
 
-
 router = APIRouter(prefix="/notes", tags=["notes"])
 
 
@@ -27,7 +26,9 @@ def create_note(payload: NoteCreateRequest) -> NoteResponse:
 def list_all_notes() -> list[NoteResponse]:
     # AI-generated (TODO4): endpoint for frontend "List Notes" button.
     rows = db.list_notes()
-    return [NoteResponse(id=r["id"], content=r["content"], created_at=r["created_at"]) for r in rows]
+    return [
+        NoteResponse(id=r["id"], content=r["content"], created_at=r["created_at"]) for r in rows
+    ]
 
 
 @router.get("/{note_id}", response_model=NoteResponse)
@@ -37,5 +38,3 @@ def get_single_note(note_id: int) -> NoteResponse:
     if row is None:
         raise HTTPException(status_code=404, detail="note not found")
     return NoteResponse(id=row["id"], content=row["content"], created_at=row["created_at"])
-
-

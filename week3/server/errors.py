@@ -46,8 +46,7 @@ def format_user_error(exc: OpenMeteoError) -> str:
         return "The weather service timed out. Please try again."
     if isinstance(exc, UpstreamResponseFormatError):
         return (
-            "The weather service returned an unexpected response format. "
-            "Please try again later."
+            "The weather service returned an unexpected response format. " "Please try again later."
         )
     if isinstance(exc, UpstreamRequestError):
         return "The weather service request failed. Please try again later."

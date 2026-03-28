@@ -18,14 +18,15 @@ def test_extract_bullets_and_checkboxes():
     assert "implement API extract endpoint" in items
     assert "Write tests" in items
 
+
 # ai generated
-def test_extract_action_items_llm_empty():#空输入测试
+def test_extract_action_items_llm_empty():  # 空输入测试
     """Test LLM extraction with empty or whitespace-only input."""
     assert extract_action_items_llm("") == []
     assert extract_action_items_llm("   \n  ") == []
 
 
-def test_extract_action_items_llm_bullet_list(monkeypatch):#列表输入测试
+def test_extract_action_items_llm_bullet_list(monkeypatch):  # 列表输入测试
     """LLM extraction should normalize bullet/checklist style inputs."""
     captured = {}
 
@@ -51,8 +52,11 @@ def test_extract_action_items_llm_bullet_list(monkeypatch):#列表输入测试
     assert captured["options"]["temperature"] == 0.0
 
 
-def test_extract_action_items_llm_keyword_prefixed_lines(monkeypatch):#关键词前缀输入测试 覆盖 TODO: / ACTION: 形式输入
+def test_extract_action_items_llm_keyword_prefixed_lines(
+    monkeypatch,
+):  # 关键词前缀输入测试 覆盖 TODO: / ACTION: 形式输入
     """LLM extraction should handle TODO/ACTION style prefixes."""
+
     class _FakeResponse:
         class message:
             content = json.dumps({"items": ["Update README", "Email project mentor"]})
@@ -69,11 +73,19 @@ def test_extract_action_items_llm_keyword_prefixed_lines(monkeypatch):#关键词
     assert items == ["Update README", "Email project mentor"]
 
 
-def test_extract_action_items_llm_implicit_tasks_in_prose(monkeypatch):#自然语言隐藏任务提取 测试
+def test_extract_action_items_llm_implicit_tasks_in_prose(monkeypatch):  # 自然语言隐藏任务提取 测试
     """LLM extraction should find tasks hidden in natural language prose, which heuristic fails to do."""
+
     class _FakeResponse:
         class message:
-            content = json.dumps({"items": ["schedule a follow-up meeting with design team", "buy more coffee for the office"]})
+            content = json.dumps(
+                {
+                    "items": [
+                        "schedule a follow-up meeting with design team",
+                        "buy more coffee for the office",
+                    ]
+                }
+            )
 
     monkeypatch.setattr(extract, "chat", lambda **kwargs: _FakeResponse())
 
@@ -83,11 +95,17 @@ def test_extract_action_items_llm_implicit_tasks_in_prose(monkeypatch):#自然�
     """.strip()
 
     items = extract_action_items_llm(text)
-    assert items == ["schedule a follow-up meeting with design team", "buy more coffee for the office"]
+    assert items == [
+        "schedule a follow-up meeting with design team",
+        "buy more coffee for the office",
+    ]
 
 
-def test_extract_action_items_llm_fallback_to_heuristic_on_chat_error(monkeypatch):#错误输入测试 异常回退测试 当 chat() 抛错时，验证会回退到 extract_action_items() 启发式逻辑
+def test_extract_action_items_llm_fallback_to_heuristic_on_chat_error(
+    monkeypatch,
+):  # 错误输入测试 异常回退测试 当 chat() 抛错时，验证会回退到 extract_action_items() 启发式逻辑
     """If chat fails, extractor should fall back to heuristic extraction."""
+
     def _raise_chat_error(**kwargs):
         raise RuntimeError("Ollama unavailable")
 
@@ -101,7 +119,10 @@ def test_extract_action_items_llm_fallback_to_heuristic_on_chat_error(monkeypatc
     items = extract_action_items_llm(text)
     assert items == ["TODO: Update README", "Write tests"]
 
+
 if __name__ == "__main__":
-    import pytest
     import sys
+
+    import pytest
+
     sys.exit(pytest.main(["-v", __file__]))

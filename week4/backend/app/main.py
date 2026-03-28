@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .db import apply_seed_if_needed, engine
@@ -22,6 +23,18 @@ app.mount("/static", StaticFiles(directory="frontend"), name="static")
 def startup_event() -> None:
     Base.metadata.create_all(bind=engine)
     apply_seed_if_needed()
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    _request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    messages = []
+    for error in exc.errors():
+        path = ".".join(str(part) for part in error["loc"] if part != "body")
+        prefix = f"{path}: " if path else ""
+        messages.append(f"{prefix}{error['msg']}")
+    return JSONResponse(status_code=400, content={"detail": messages})
 
 
 @app.get("/")

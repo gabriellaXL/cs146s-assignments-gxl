@@ -2,11 +2,9 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .config import get_settings
@@ -22,6 +20,7 @@ async def lifespan(_: FastAPI):
     # AI-generated (TODO3): move DB initialization into app lifecycle (no import-time side effects).
     init_db()
     yield
+
 
 app = FastAPI(title=settings.app_title, lifespan=lifespan)
 

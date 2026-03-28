@@ -18,7 +18,6 @@ from week3.server.errors import (
 )
 from week3.server.models import CurrentWeather, PlaceMatch
 
-
 WMO_LABELS: dict[int, str] = {
     0: "Clear sky",
     1: "Mostly clear",

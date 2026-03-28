@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 import sys
 
-
 LOGGER_NAME = "week3.openmeteo_mcp"
 
 

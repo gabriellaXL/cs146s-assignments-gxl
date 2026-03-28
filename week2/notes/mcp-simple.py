@@ -1,5 +1,6 @@
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict
+
 from fastmcp import FastMCP
 
 mcp = FastMCP(name="SimpleMCPTestServer")
@@ -14,6 +15,7 @@ def resolve_abs_path(path_str: str) -> Path:
         path = (Path.cwd() / path).resolve()
     return path
 
+
 @mcp.tool
 def read_file_tool(filename: str) -> Dict[str, Any]:
     """
@@ -24,12 +26,10 @@ def read_file_tool(filename: str) -> Dict[str, Any]:
     full_path = resolve_abs_path(filename)
     print(full_path)
     # TODO (mihail): Be more defensive in the file reading here
-    with open(str(full_path), "r") as f:
+    with open(str(full_path)) as f:
         content = f.read()
-    return {
-        "file_path": str(full_path),
-        "content": content
-    }
+    return {"file_path": str(full_path), "content": content}
+
 
 @mcp.tool
 def list_files_tool(path: str) -> Dict[str, Any]:
@@ -41,14 +41,9 @@ def list_files_tool(path: str) -> Dict[str, Any]:
     full_path = resolve_abs_path(path)
     all_files = []
     for item in full_path.iterdir():
-        all_files.append({
-            "filename": item.name,
-            "type": "file" if item.is_file() else "dir"
-        })
-    return {
-        "path": str(full_path),
-        "files": all_files
-    }
+        all_files.append({"filename": item.name, "type": "file" if item.is_file() else "dir"})
+    return {"path": str(full_path), "files": all_files}
+
 
 @mcp.tool
 def edit_file_tool(path: str, old_str: str, new_str: str) -> Dict[str, Any]:
@@ -63,22 +58,14 @@ def edit_file_tool(path: str, old_str: str, new_str: str) -> Dict[str, Any]:
     p = Path(full_path)
     if old_str == "":
         p.write_text(new_str, encoding="utf-8")
-        return {
-            "path": str(full_path),
-            "action": "created_file"
-        }
+        return {"path": str(full_path), "action": "created_file"}
     original = p.read_text(encoding="utf-8")
     if original.find(old_str) == -1:
-        return {
-            "path": str(full_path),
-            "action": "old_str not found"
-        }
+        return {"path": str(full_path), "action": "old_str not found"}
     edited = original.replace(old_str, new_str, 1)
     p.write_text(edited, encoding="utf-8")
-    return {
-        "path": str(full_path),
-        "action": "edited"
-    }
+    return {"path": str(full_path), "action": "edited"}
+
 
 if __name__ == "__main__":
     mcp.run()

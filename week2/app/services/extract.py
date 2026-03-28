@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+import json
 import logging
 import re
-import json
 from typing import List
 
+from dotenv import load_dotenv
 from ollama import chat
 from pydantic import BaseModel
-from dotenv import load_dotenv
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -31,6 +31,7 @@ def _is_action_line(line: str) -> bool:
     if "[ ]" in stripped or "[todo]" in stripped:
         return True
     return False
+
 
 # 正则化/启发式提取
 def extract_action_items(text: str) -> List[str]:
@@ -90,10 +91,11 @@ def _looks_imperative(sentence: str) -> bool:
     }
     return first.lower() in imperative_starters
 
+
 # ai-generated,由ai驱动的提取方案，使用 Ollama 通过大语言模型来做行动项提取。 可以提取出没有[ ]前缀的纯文本行，这是比原来的正则启发式更智能的地方之一。
 # 在后面的TODO中，LLM提取会是一个新的独立API接口，会有两种提取方式可选，与正则化提取函数不冲突。
 class ActionItemList(BaseModel):
-    items: List[str]#Pydantic 模型，用于结构化输出
+    items: List[str]  # Pydantic 模型，用于结构化输出
 
 
 def extract_action_items_llm(text: str) -> List[str]:
@@ -132,4 +134,3 @@ def extract_action_items_llm(text: str) -> List[str]:
         logger.warning("LLM extraction failed, fallback to heuristic extractor: %s", e)
         # Fallback to the heuristic method if LLM fails
         return extract_action_items(text)
-

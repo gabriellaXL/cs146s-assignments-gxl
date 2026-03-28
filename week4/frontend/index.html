@@ -12,16 +12,25 @@
 
       <section>
         <h2>Notes</h2>
+        <p id="note-feedback" class="feedback" aria-live="polite"></p>
+        <div id="note-search">
+          <input id="search-input" placeholder="Search notes..." />
+          <button id="search-btn" type="button">Search</button>
+          <button id="search-clear" type="button">Clear</button>
+        </div>
         <form id="note-form">
+          <input id="note-id" type="hidden" />
           <input id="note-title" placeholder="Title" required />
           <input id="note-content" placeholder="Content" required />
-          <button type="submit">Add</button>
+          <button id="note-submit" type="submit">Add</button>
+          <button id="note-cancel" type="button" hidden>Cancel</button>
         </form>
         <ul id="notes"></ul>
       </section>
 
       <section>
         <h2>Action Items</h2>
+        <p id="action-feedback" class="feedback" aria-live="polite"></p>
         <form id="action-form">
           <input id="action-desc" placeholder="Description" required />
           <button type="submit">Add</button>
