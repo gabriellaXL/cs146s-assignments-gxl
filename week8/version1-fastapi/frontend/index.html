@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Developer Control Center</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Week 8 FastAPI Version</p>
+          <h1>Developer Control Center</h1>
+          <p class="lede">
+            A note-focused CRUD app built with FastAPI, SQLite, and a lightweight static frontend.
+          </p>
+        </div>
+      </header>
+
+      <div id="message" class="message hidden" role="status" aria-live="polite"></div>
+
+      <section class="layout-grid">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Notes</h2>
+              <p class="panel-copy">Search, sort, open, and manage notes.</p>
+            </div>
+            <button id="new-note-btn" type="button" class="button button-primary">New note</button>
+          </div>
+
+          <div class="toolbar">
+            <input id="note-search" placeholder="Search title or content" />
+            <select id="note-sort">
+              <option value="-updated_at">Recently updated</option>
+              <option value="-created_at">Recently created</option>
+              <option value="title">Title A-Z</option>
+              <option value="-title">Title Z-A</option>
+              <option value="status">Status A-Z</option>
+            </select>
+            <button id="note-search-btn" type="button" class="button">Apply</button>
+          </div>
+
+          <ul id="notes" class="note-list"></ul>
+          <p id="empty-state" class="empty-state hidden">
+            No notes yet. Create the first note to start tracking plans, blockers, or release work.
+          </p>
+        </article>
+
+        <aside class="panel detail-panel">
+          <div class="panel-header">
+            <div>
+              <h2 id="detail-heading">Create note</h2>
+              <p class="panel-copy" id="detail-copy">Add a new note or edit an existing one.</p>
+            </div>
+          </div>
+
+          <form id="note-form" class="form-stack">
+            <input type="hidden" id="note-id" />
+
+            <label>
+              Title
+              <input id="note-title" maxlength="120" placeholder="Sprint retro summary" required />
+            </label>
+
+            <label>
+              Content
+              <textarea
+                id="note-content"
+                rows="7"
+                maxlength="5000"
+                placeholder="Capture the note details here."
+                required
+              ></textarea>
+            </label>
+
+            <label>
+              Status
+              <select id="note-status">
+                <option value="active">Active</option>
+                <option value="blocked">Blocked</option>
+                <option value="archived">Archived</option>
+              </select>
+            </label>
+
+            <div class="form-actions">
+              <button id="save-note-btn" type="submit" class="button button-primary">Save note</button>
+              <button id="cancel-edit-btn" type="button" class="button hidden">Cancel</button>
+            </div>
+          </form>
+
+          <section id="note-detail" class="note-detail hidden">
+            <div class="detail-meta">
+              <span id="detail-status" class="status-badge"></span>
+              <span id="detail-updated"></span>
+            </div>
+            <h3 id="detail-title"></h3>
+            <p id="detail-content"></p>
+            <div class="detail-actions">
+              <button id="edit-note-btn" type="button" class="button">Edit</button>
+              <button id="delete-note-btn" type="button" class="button button-danger">Delete</button>
+            </div>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

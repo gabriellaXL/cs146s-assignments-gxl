@@ -3,7 +3,7 @@ import { SelectHTMLAttributes } from 'react';
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   error?: string;
-  options: { value: string; label: string }[];
+  options: ReadonlyArray<{ value: string; label: string }>;
 }
 
 export function Select({ label, error, options, className = '', ...props }: SelectProps) {

@@ -1,0 +1,237 @@
+:root {
+  color-scheme: light;
+  --bg: #f3efe6;
+  --panel: rgba(255, 255, 255, 0.92);
+  --ink: #201710;
+  --muted: #6f6254;
+  --line: rgba(32, 23, 16, 0.14);
+  --accent: #0f5a4f;
+  --accent-strong: #0b433c;
+  --danger: #8b2f2f;
+  --shadow: 0 20px 60px rgba(40, 29, 18, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(15, 90, 79, 0.09), transparent 28%),
+    radial-gradient(circle at top right, rgba(179, 124, 42, 0.14), transparent 24%),
+    linear-gradient(180deg, #f8f4ec 0%, var(--bg) 100%);
+}
+
+.page-shell {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+.hero {
+  margin-bottom: 1.5rem;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0 0 0.4rem;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 3vw, 3.4rem);
+}
+
+.lede {
+  max-width: 60ch;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.message {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.message.error {
+  border-color: rgba(139, 47, 47, 0.4);
+  background: #fff3f2;
+}
+
+.message.success {
+  border-color: rgba(15, 90, 79, 0.35);
+  background: #eef9f6;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 0.95fr;
+  gap: 1rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.panel-header h2 {
+  margin: 0;
+}
+
+.panel-copy {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+}
+
+.toolbar,
+.form-actions,
+.detail-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.toolbar {
+  margin-bottom: 1rem;
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 0.72rem 0.8rem;
+  border: 1px solid var(--line);
+  background: #fffdf9;
+  color: var(--ink);
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+.form-stack {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.button {
+  border: 1px solid var(--line);
+  background: #fffdf9;
+  color: var(--ink);
+  padding: 0.72rem 0.95rem;
+  cursor: pointer;
+}
+
+.button-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.button-primary:hover {
+  background: var(--accent-strong);
+}
+
+.button-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.note-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.note-card {
+  border: 1px solid var(--line);
+  background: #fffdf9;
+  padding: 1rem;
+}
+
+.note-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.note-card h3,
+.note-detail h3 {
+  margin: 0 0 0.35rem;
+}
+
+.note-card p,
+.note-detail p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.note-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--line);
+  text-transform: capitalize;
+  font-size: 0.9rem;
+  background: #ebe2cf;
+}
+
+.detail-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  color: var(--muted);
+  margin-bottom: 0.85rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.empty-state {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .layout-grid {
+    grid-template-columns: 1fr;
+  }
+}

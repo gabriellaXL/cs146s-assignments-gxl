@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { FileText, ChevronRight } from 'lucide-react';
-import { useRouter } from '../lib/router';
 import { getNotes } from '../services/notes';
 import type { Note } from '../lib/database.types';
 import { Alert } from '../components/ui/Alert';
+import { useRouter } from '../lib/router-context';
 
 const STATUS_STYLES = {
   active: 'bg-green-100 text-green-800',
   blocked: 'bg-red-100 text-red-800',
   archived: 'bg-gray-100 text-gray-800',
-};
+} as const;
 
 export function NotesList() {
   const { navigate } = useRouter();

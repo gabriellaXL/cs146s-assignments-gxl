@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { useRouter, parseRoute } from '../lib/router';
+import { parseRoute } from '../lib/route-utils';
+import { useRouter } from '../lib/router-context';
 import { getNoteById, createNote, updateNote, ValidationError } from '../services/notes';
 import type { NoteStatus } from '../lib/database.types';
 import { Button } from '../components/ui/Button';

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, CreditCard as Edit, Trash2 } from 'lucide-react';
-import { useRouter, parseRoute } from '../lib/router';
+import { parseRoute } from '../lib/route-utils';
+import { useRouter } from '../lib/router-context';
 import { getNoteById, deleteNote } from '../services/notes';
 import type { Note } from '../lib/database.types';
 import { Button } from '../components/ui/Button';
@@ -11,7 +12,7 @@ const STATUS_STYLES = {
   active: 'bg-green-100 text-green-800',
   blocked: 'bg-red-100 text-red-800',
   archived: 'bg-gray-100 text-gray-800',
-};
+} as const;
 
 export function NoteDetail() {
   const { currentPath, navigate } = useRouter();

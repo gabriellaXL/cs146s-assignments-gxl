@@ -12,6 +12,14 @@ export interface ServiceResult<T> {
   validationErrors?: ValidationError[];
 }
 
+function asNoteArray(data: unknown): Note[] {
+  return (data as Note[]) || [];
+}
+
+function asNote(data: unknown): Note {
+  return data as Note;
+}
+
 export function validateNote(data: { title?: string; content?: string }): ValidationError[] {
   const errors: ValidationError[] = [];
 
@@ -41,8 +49,8 @@ export async function getNotes(): Promise<ServiceResult<Note[]>> {
       return { error: error.message };
     }
 
-    return { data: data || [] };
-  } catch (err) {
+    return { data: asNoteArray(data) };
+  } catch {
     return { error: 'Failed to fetch notes' };
   }
 }
@@ -63,8 +71,8 @@ export async function getNoteById(id: string): Promise<ServiceResult<Note>> {
       return { error: 'Note not found' };
     }
 
-    return { data };
-  } catch (err) {
+    return { data: asNote(data) };
+  } catch {
     return { error: 'Failed to fetch note' };
   }
 }
@@ -78,10 +86,7 @@ export async function createNote(noteData: NoteInsert): Promise<ServiceResult<No
   try {
     const { data, error } = await supabase
       .from('notes')
-      .insert({
-        ...noteData,
-        updated_at: new Date().toISOString(),
-      })
+      .insert(noteData)
       .select()
       .single();
 
@@ -89,8 +94,8 @@ export async function createNote(noteData: NoteInsert): Promise<ServiceResult<No
       return { error: error.message };
     }
 
-    return { data };
-  } catch (err) {
+    return { data: asNote(data) };
+  } catch {
     return { error: 'Failed to create note' };
   }
 }
@@ -104,10 +109,7 @@ export async function updateNote(id: string, noteData: NoteUpdate): Promise<Serv
   try {
     const { data, error } = await supabase
       .from('notes')
-      .update({
-        ...noteData,
-        updated_at: new Date().toISOString(),
-      })
+      .update(noteData)
       .eq('id', id)
       .select()
       .single();
@@ -116,8 +118,8 @@ export async function updateNote(id: string, noteData: NoteUpdate): Promise<Serv
       return { error: error.message };
     }
 
-    return { data };
-  } catch (err) {
+    return { data: asNote(data) };
+  } catch {
     return { error: 'Failed to update note' };
   }
 }
@@ -134,7 +136,7 @@ export async function deleteNote(id: string): Promise<ServiceResult<void>> {
     }
 
     return {};
-  } catch (err) {
+  } catch {
     return { error: 'Failed to delete note' };
   }
 }

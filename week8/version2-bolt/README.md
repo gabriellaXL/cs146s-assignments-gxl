@@ -1,183 +1,155 @@
 # Developer Control Center
 
-A full-stack note management application built with React, TypeScript, Vite, and Supabase.
-
-## Features
-
-- **Create Notes**: Add new notes with title, content, and status
-- **View Notes**: Browse all notes in a list or view individual note details
-- **Edit Notes**: Update existing notes
-- **Delete Notes**: Remove notes with confirmation
-- **Validation**: Client-side and server-side validation for data integrity
-- **Persistent Storage**: Real database-backed storage using Supabase PostgreSQL
+This is the Bolt-generated Week 8 implementation of the shared notes application. It uses a React frontend with Supabase-backed persistence and was manually refined after generation to improve validation, typing, and submission-readiness.
 
 ## Tech Stack
 
-- **Frontend**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **Database**: Supabase (PostgreSQL)
-- **Icons**: Lucide React
+- Frontend: React 18 + TypeScript
+- Build tool: Vite
+- Styling: Tailwind CSS
+- Persistence: Supabase PostgreSQL
+- Database client: `@supabase/supabase-js`
+
+## Core Features
+
+- Create notes with `title`, `content`, and `status`
+- View all notes in a list with empty-state handling
+- View a single note in detail
+- Edit existing notes
+- Delete notes with a confirmation dialog
+- Validate title and content lengths before writes
+- Persist data in a real hosted PostgreSQL database
 
 ## Data Model
 
 Each note contains:
-- `id` - Unique identifier (UUID)
-- `title` - Note title (required, min 3 characters)
-- `content` - Note content (required, min 10 characters)
-- `status` - Note status: active, blocked, or archived
-- `created_at` - Creation timestamp
-- `updated_at` - Last update timestamp
 
-## Validation Rules
+- `id` - UUID primary key
+- `title` - required, minimum 3 characters
+- `content` - required, minimum 10 characters
+- `status` - `active`, `blocked`, or `archived`
+- `created_at` - creation timestamp
+- `updated_at` - last update timestamp
 
-- **Title**: Required, minimum 3 characters
-- **Content**: Required, minimum 10 characters
-- **Status**: Must be one of: active, blocked, archived
+## Validation
+
+Validation happens in two places:
+
+- Client-side service validation before create/update requests
+- Database-level constraints in Supabase migrations for status and minimum trimmed lengths
 
 ## Prerequisites
 
 - Node.js 18+ and npm
 - A Supabase account and project
 
-## Setup Instructions
+## Local Setup
 
-### 1. Clone or Download the Project
+1. Move into the project directory:
 
 ```bash
-git clone <repository-url>
-cd developer-control-center
+cd week8/version2-bolt
 ```
 
-### 2. Install Dependencies
+2. Install dependencies:
 
 ```bash
 npm install
 ```
 
-### 3. Environment Variables
+3. Copy the environment template:
 
-The project includes a `.env` file with Supabase credentials. Ensure it contains:
-
+```bash
+cp .env.example .env
 ```
+
+4. Fill in your Supabase values in `.env`:
+
+```env
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-### 4. Database Setup
+5. Create a Supabase project and apply the SQL files in `supabase/migrations/` in order.
 
-The database migration has already been applied. The `notes` table includes:
-- Row Level Security (RLS) enabled
-- Public access policies for local development
-- Check constraints for status values
-- Indexes for optimal performance
+You can do this either:
 
-### 5. Run the Development Server
+- in the Supabase SQL editor by pasting the migration files one by one
+- or with the Supabase CLI if you already use it
+
+6. Start the development server:
 
 ```bash
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`
+7. Open `http://localhost:5173`
 
-### 6. Build for Production
+## Build and Checks
 
 ```bash
 npm run build
+npm run lint
+npm run typecheck
 ```
-
-The production build will be in the `dist` directory.
 
 ## Project Structure
 
-```
+```text
 src/
-├── components/          # Reusable UI components
-│   ├── ui/             # Base UI components (Button, Input, Modal, etc.)
-│   ├── Layout.tsx      # Main layout with header and navigation
-│   └── DeleteConfirmation.tsx  # Delete confirmation modal
-├── pages/              # Page components
-│   ├── NotesList.tsx   # Notes list page
-│   ├── NoteDetail.tsx  # Note detail page
-│   └── NoteForm.tsx    # Create/edit note form
-├── services/           # Business logic and API calls
-│   └── notes.ts        # Notes CRUD operations and validation
-├── lib/                # Core utilities
-│   ├── supabase.ts     # Supabase client configuration
-│   ├── database.types.ts  # TypeScript types for database
-│   └── router.tsx      # Simple hash-based routing
-├── App.tsx             # Main app component with routing
-└── main.tsx            # Application entry point
+  components/
+    ui/                    shared UI primitives
+  pages/                   notes list, detail, create, and edit views
+  services/notes.ts        CRUD operations and client-side validation
+  lib/supabase.ts          Supabase client setup
+  lib/database.types.ts    typed database schema
+  lib/router.tsx           hash-based router provider
+  lib/route-utils.ts       route parsing helper
+  App.tsx                  app shell and route selection
+  main.tsx                 application entry point
 
-supabase/
-└── migrations/         # Database migrations
-    └── create_notes_table.sql
+supabase/migrations/
+  20260329110307_create_notes_table.sql
+  20260329195000_harden_notes_constraints.sql
 ```
 
 ## Key Files
 
-### Frontend
-- `src/App.tsx` - Main application component with routing logic
-- `src/pages/NotesList.tsx` - Notes list view with empty state
-- `src/pages/NoteDetail.tsx` - Individual note view
-- `src/pages/NoteForm.tsx` - Create and edit form
+- `src/App.tsx` - high-level route selection
+- `src/pages/NotesList.tsx` - notes list and empty state
+- `src/pages/NoteDetail.tsx` - detail view and delete flow
+- `src/pages/NoteForm.tsx` - create/edit form
+- `src/services/notes.ts` - CRUD service logic and validation
+- `src/lib/supabase.ts` - Supabase client initialization
+- `supabase/migrations/` - schema, policies, constraints, and timestamp trigger
 
-### Backend/Database
-- `src/services/notes.ts` - All database operations (CRUD)
-- `src/lib/supabase.ts` - Supabase client singleton
-- `supabase/migrations/create_notes_table.sql` - Database schema
+## Manual Fixes After Generation
 
-### Database Logic
-- All persistence is handled through Supabase PostgreSQL
-- Service layer validates data before database operations
-- Row Level Security policies allow public access for local development
-
-## Usage
-
-1. **Create a Note**: Click "New Note" button, fill in the form, and click "Create Note"
-2. **View Notes**: The home page lists all notes
-3. **View Details**: Click on any note to view full details
-4. **Edit a Note**: Click "Edit" on the detail page
-5. **Delete a Note**: Click "Delete" on the detail page and confirm
-
-## Known Limitations
-
-- **No Authentication**: The app does not include user authentication. All notes are public.
-- **Single User**: Designed for single-user local development
-- **No Real-time Updates**: Changes don't sync automatically across tabs
-- **Basic Routing**: Uses hash-based routing instead of browser history API
-- **No Pagination**: All notes load at once (fine for small datasets)
+- Tightened Supabase TypeScript schema definitions so `npm run typecheck` can pass
+- Split route parsing into a standalone helper to keep React fast-refresh lint output clean
+- Added a second SQL migration for database-level validation and automatic `updated_at` maintenance
+- Reworked setup instructions around `.env.example` instead of relying on a private local `.env`
 
 ## Security Notes
 
-- RLS is enabled with public access policies for local development
-- In production, you should implement proper authentication and restrict RLS policies
-- Never commit real credentials to version control
+- RLS is enabled, but this class project intentionally allows public CRUD with the anon role for simplicity
+- Do not reuse these public policies in a real production application
+- Do not commit real Supabase credentials; use `.env.example` as the shared template
 
-## Development
+## Known Limitations
 
-### Type Checking
+- No authentication
+- Notes are effectively public within the configured Supabase project
+- Basic hash-based routing rather than browser-history routing
+- No pagination or filtering
+- Persistence depends on a configured Supabase project rather than a purely local database
 
-```bash
-npm run typecheck
-```
+## Development Review Workflow
 
-### Linting
+This version was not accepted as-generated. It was reviewed and refined with:
 
-```bash
-npm run lint
-```
-
-## Future Enhancements
-
-Potential features that could be added:
-- User authentication and authorization
-- Note filtering and search
-- Tags or categories
-- Rich text editor
-- Export functionality
-- Dark mode
-
-## License
-
-MIT
+- manual code review of routing, CRUD flows, and environment handling
+- `npm run lint`
+- `npm run typecheck`
+- `npm run build`
+- `npm audit` to scan dependency vulnerabilities

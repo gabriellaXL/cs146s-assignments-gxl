@@ -1,4 +1,6 @@
-import { RouterProvider, useRouter, parseRoute } from './lib/router';
+import { RouterProvider } from './lib/router';
+import { parseRoute } from './lib/route-utils';
+import { useRouter } from './lib/router-context';
 import { Layout } from './components/Layout';
 import { NotesList } from './pages/NotesList';
 import { NoteDetail } from './pages/NoteDetail';

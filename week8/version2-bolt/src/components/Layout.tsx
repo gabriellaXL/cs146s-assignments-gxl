@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { FileText, Plus } from 'lucide-react';
-import { useRouter } from '../lib/router';
+import { useRouter } from '../lib/router-context';
 import { Button } from './ui/Button';
 
 interface LayoutProps {
