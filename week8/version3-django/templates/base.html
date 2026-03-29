@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Django Notes Manager{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="site-header">
+        <div>
+          <h1><a href="{% url 'notes:list' %}">Developer Control Center</a></h1>
+          <p class="lede">A stable Django implementation of the Week 8 notes CRUD app.</p>
+        </div>
+        <a class="button" href="{% url 'notes:create' %}">Create note</a>
+      </header>
+
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>

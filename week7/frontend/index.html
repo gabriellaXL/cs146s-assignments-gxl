@@ -8,7 +8,7 @@
   </head>
   <body>
     <main>
-      <h1>Modern Software Dev Starter (Week 6)</h1>
+      <h1>Modern Software Dev Starter (Week 7)</h1>
 
       <section>
         <h2>Notes</h2>
@@ -28,17 +28,34 @@
         <h2>Action Items</h2>
         <form id="action-form">
           <input id="action-desc" placeholder="Description" required />
+          <select id="action-project">
+            <option value="">No project</option>
+          </select>
           <button type="submit">Add</button>
         </form>
         <div style="margin:.25rem 0;">
           <label><input type="checkbox" id="filter-completed" /> Show completed only</label>
         </div>
+        <div style="margin:.25rem 0;">
+          <label for="action-project-filter">Filter by project:</label>
+          <select id="action-project-filter">
+            <option value="">All projects</option>
+          </select>
+        </div>
         <ul id="actions"></ul>
+      </section>
+
+      <section>
+        <h2>Projects</h2>
+        <form id="project-form">
+          <input id="project-name" placeholder="Project name" required />
+          <input id="project-description" placeholder="Project description" />
+          <button type="submit">Add project</button>
+        </form>
+        <ul id="projects"></ul>
       </section>
     </main>
 
     <script src="/static/app.js"></script>
   </body>
   </html>
-
-

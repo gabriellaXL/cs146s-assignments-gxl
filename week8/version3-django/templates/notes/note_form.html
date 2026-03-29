@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if object %}Edit {{ object.title }}{% else %}Create note{% endif %}
+{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h2>{% if object %}Edit note{% else %}Create note{% endif %}</h2>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <label for="{{ form.title.id_for_label }}">
+        Title
+        {{ form.title }}
+        {{ form.title.errors }}
+      </label>
+
+      <label for="{{ form.content.id_for_label }}">
+        Content
+        {{ form.content }}
+        {{ form.content.errors }}
+      </label>
+
+      <label for="{{ form.status.id_for_label }}">
+        Status
+        {{ form.status }}
+        {{ form.status.errors }}
+      </label>
+
+      <div class="actions">
+        <button type="submit">{% if object %}Save changes{% else %}Create note{% endif %}</button>
+        <a class="secondary" href="{% url 'notes:list' %}">Cancel</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

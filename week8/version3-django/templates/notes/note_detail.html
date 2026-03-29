@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}{{ note.title }}{% endblock %}
+
+{% block content %}
+  <article class="panel note-detail">
+    <h2>{{ note.title }}</h2>
+    <p><span class="badge">{{ note.get_status_display }}</span></p>
+    <p>{{ note.content|linebreaksbr }}</p>
+    <p class="meta">Created {{ note.created_at|date:"Y-m-d H:i" }} | Updated {{ note.updated_at|date:"Y-m-d H:i" }}</p>
+    <div class="actions">
+      <a href="{% url 'notes:update' note.pk %}">Edit</a>
+      <a class="secondary" href="{% url 'notes:delete' note.pk %}">Delete</a>
+      <a class="secondary" href="{% url 'notes:list' %}">Back to list</a>
+    </div>
+  </article>
+{% endblock %}

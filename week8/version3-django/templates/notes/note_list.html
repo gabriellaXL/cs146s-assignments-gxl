@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Notes{% endblock %}
+
+{% block content %}
+  <section class="layout-grid">
+    <div class="panel">
+      <h2>Notes</h2>
+      {% if notes %}
+        <ul class="note-list">
+          {% for note in notes %}
+            <li class="note-card">
+              <h3><a href="{{ note.get_absolute_url }}">{{ note.title }}</a></h3>
+              <p class="meta">
+                <span class="badge">{{ note.get_status_display }}</span>
+                Updated {{ note.updated_at|date:"Y-m-d H:i" }}
+              </p>
+              <p>{{ note.content|truncatechars:140 }}</p>
+              <div class="actions">
+                <a href="{{ note.get_absolute_url }}">View</a>
+                <a href="{% url 'notes:update' note.pk %}">Edit</a>
+                <a class="secondary" href="{% url 'notes:delete' note.pk %}">Delete</a>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-state">
+          No notes yet. Create the first note to start tracking plans, blockers, or release work.
+        </p>
+      {% endif %}
+    </div>
+
+    <aside class="panel">
+      <h2>Scope</h2>
+      <p>This Django version focuses on a single primary resource to keep the Week 8 implementations aligned.</p>
+      <ul>
+        <li>Full note CRUD</li>
+        <li>SQLite persistence</li>
+        <li>Validation and error handling</li>
+        <li>Server-rendered HTML pages</li>
+      </ul>
+    </aside>
+  </section>
+{% endblock %}
