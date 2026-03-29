@@ -9,16 +9,15 @@ Fill out the remaining personal details and PR links in this file.
 
 ## Submission Details
 
-Name: **TODO** \
-SUNet ID: **TODO** \
-Citations: **TODO**
+Name: **gxl** \
+SUNet ID: **** \
+Citations: ****
 
-This assignment took me about **TODO** hours to do.
+This assignment took me about **4** hours to do.
 
 ## Task 1: Add more endpoints and validations
 a. Links to relevant commits/issues
-> Pending. Add the Task 1 branch, commit(s), and PR link after opening the PR.
-
+>  https://app.graphite.com/github/pr/gabriellaXL/cs146s-assignments-gxl/1
 b. PR Description
 > This PR expands the Week 7 starter API with stronger validation, clearer error handling, and a more complete resource surface for notes and action items.
 >
