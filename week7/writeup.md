@@ -1,25 +1,23 @@
 # Week 7 Write-up
 Tip: To preview this markdown file
-- On Mac, press `Command (⌘) + Shift + V`
+- On Mac, press `Command + Shift + V`
 - On Windows/Linux, press `Ctrl + Shift + V`
 
 ## Instructions
 
-Fill out all of the `TODO`s in this file.
+Fill out the remaining personal details and PR links in this file.
 
 ## Submission Details
 
-Name: **TODO** \
-SUNet ID: **TODO** \
-Citations: **TODO**
+Name: **gxl** \
+SUNet ID: **** \
+Citations: ****
 
-This assignment took me about **TODO** hours to do. 
-
+This assignment took me about **4** hours to do.
 
 ## Task 1: Add more endpoints and validations
 a. Links to relevant commits/issues
-> Pending. Add the Task 1 branch, commit(s), and PR link after opening the PR.
-
+>  https://app.graphite.com/github/pr/gabriellaXL/cs146s-assignments-gxl/1
 b. PR Description
 > This PR expands the Week 7 starter API with stronger validation, clearer error handling, and a more complete resource surface for notes and action items.
 >
@@ -182,15 +180,54 @@ b. PR Description
 c. Graphite Diamond generated code review
 > Pending. Add screenshots or quoted review comments from Graphite Diamond after the PR is opened and reviewed.
 
-## Brief Reflection 
+## Brief Reflection
 a. The types of comments you typically made in your manual reviews (e.g., correctness, performance, security, naming, test gaps, API shape, UX, docs).
-> TODO 
+> In my manual reviews, I mostly focused on correctness, API shape, and test gaps. I paid the most attention to whether the endpoints had a predictable contract, whether invalid inputs failed clearly, whether new abstractions actually reduced duplication, and whether the tests would catch regressions rather than only confirm happy paths. I also paid attention to maintainability issues such as duplicated query logic, fragile heuristic code, and schema evolution risks around SQLite. For frontend changes, I only made comments when they affected actual usability or consistency with the backend contract.
 
-b. A comparison of **your** comments vs. **Graphite’s** AI-generated comments for each PR.
-> TODO
+b. A comparison of **your** comments vs. **Graphite鈥檚** AI-generated comments for each PR.
+> Pending until Graphite Diamond reviews are available. I plan to compare them PR-by-PR using the following structure:
+>
+> Task 1:
+> - My review emphasized API contract clarity, validation strictness, and Windows test fixture stability.
+> - Graphite emphasized: **TODO after Graphite review**
+> - Overlap / difference: **TODO after Graphite review**
+>
+> Task 2:
+> - My review emphasized rule determinism, false positives/false negatives, and whether extraction behavior was actually regression-tested.
+> - Graphite emphasized: **TODO after Graphite review**
+> - Overlap / difference: **TODO after Graphite review**
+>
+> Task 3:
+> - My review emphasized relationship design, delete semantics, serialization shape, and SQLite schema compatibility.
+> - Graphite emphasized: **TODO after Graphite review**
+> - Overlap / difference: **TODO after Graphite review**
+>
+> Task 4:
+> - My review emphasized whether the tests had real fault-detection power, especially for sorting, page slicing, and filter composition.
+> - Graphite emphasized: **TODO after Graphite review**
+> - Overlap / difference: **TODO after Graphite review**
 
 c. When the AI reviews were better/worse than yours (cite specific examples)
-> TODO
+> Tentative expectation before reading the final Graphite reviews:
+>
+> AI reviews will probably be better than mine at:
+> - spotting missed edge cases in touched code paths
+> - pointing out consistency issues across similar endpoints or schemas
+> - scanning for repeated patterns that look suspicious across multiple files
+>
+> AI reviews will probably be worse than mine at:
+> - judging whether a tradeoff was intentional for the assignment scope
+> - deciding when a lightweight solution is acceptable instead of overengineering
+> - understanding whether a test is high-value or just mechanically broader
+>
+> After Graphite review, I should replace this with concrete examples from each PR, especially cases where Graphite either caught a real issue I missed or raised a low-signal suggestion that I intentionally ignored.
 
 d. Your comfort level trusting AI reviews going forward and any heuristics for when to rely on them.
->TODO 
+> I am comfortable using AI review as a second-pass tool, but not as the sole reviewer. I trust it most for broad coverage, consistency checks, and identifying places where I may have forgotten a test, an error case, or a related code path. I trust it less for architectural judgment, assignment-scoped tradeoffs, and recommendations that increase complexity without a clear payoff.
+>
+> My heuristics going forward are:
+> - Trust AI review more for local correctness checks and regression risks.
+> - Trust it less for product or architecture decisions unless the reasoning is concrete and testable.
+> - Treat comments as high-signal when they point to a specific failing scenario, missing validation, or missing test.
+> - Treat comments as low-signal when they are generic style suggestions or recommend abstractions without demonstrating a real maintenance benefit.
+> - Always manually verify any comment that would change API behavior, data modeling, or deletion/update semantics.
